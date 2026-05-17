@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="bn">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,19 +28,21 @@
     text-align:center;
     backdrop-filter:blur(10px);
     box-shadow:0 0 60px rgba(255,80,120,0.2);
-    display: flex;
+    display: none;
     flex-direction: column;
+    opacity: 0;
+    transition: opacity 0.4s ease;
   }
+  .card.active { display: flex; opacity: 1; }
   .big-heart { font-size:52px; margin-bottom:14px; animation:pulse 1.5s ease-in-out infinite; display:block; }
   @keyframes pulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.15);} }
   .from-text { font-size:12px; color:rgba(255,180,200,0.6); letter-spacing:3px; text-transform:uppercase; margin-bottom:10px; }
   .message { font-size:19px; color:rgba(255,220,230,0.95); line-height:1.6; margin:16px 0 28px; font-style:italic; }
-  .btns { display:flex; gap:14px; justify-content:center; }
-  .btn { padding:13px 32px; border-radius:50px; font-size:16px; font-weight:600; cursor:pointer; border:none; transition:transform 0.15s, box-shadow 0.15s; }
+  .btns { display:flex; gap:14px; justify-content:center; align-items: center; min-height: 60px; }
+  .btn { padding:13px 32px; border-radius:50px; font-size:16px; font-weight:600; cursor:pointer; border:none; transition:transform 0.2s, box-shadow 0.2s, font-size 0.2s; }
   .btn-pink { background:linear-gradient(135deg,#ff6b9d,#ff3366); color:white; box-shadow:0 4px 20px rgba(255,80,120,0.45); }
   .btn-pink:hover { transform:scale(1.07); box-shadow:0 6px 28px rgba(255,80,120,0.65); }
   .btn-ghost { background:rgba(255,255,255,0.08); color:rgba(255,200,210,0.8); border:1px solid rgba(255,150,180,0.3); }
-  .btn-ghost:hover { transform:scale(0.95); }
   .setup-title { font-size:22px; font-weight:700; color:#ff6b9d; margin-bottom:6px; }
   .setup-sub { font-size:13px; color:rgba(255,200,215,0.65); margin-bottom:26px; }
   .input-group { margin-bottom:14px; text-align:left; }
@@ -76,24 +78,23 @@
     0% { transform:translateY(-20px) rotate(0deg); opacity:1; }
     100% { transform:translateY(110vh) rotate(720deg); opacity:0; }
   }
-  .small-btn { font-size:12px; padding:9px 20px; margin-top:18px; align-self: center; }
 </style>
 </head>
 <body>
 <div class="hearts-bg" id="heartsBg"></div>
 
-<!-- ১. সেটআপ প্যানেল (এখানে লিংক তৈরি হবে) -->
+<!-- ১. সেটআপ প্যানেল (শুধুমাত্র আপনি দেখতে পাবেন যখন লিংক তৈরি করবেন) -->
 <div class="card" id="setupScreen">
   <span class="big-heart">💝</span>
   <div class="setup-title">Make Your Proposal</div>
   <div class="setup-sub">Customize & send to your special someone ✨</div>
   <div class="input-group">
     <label>Your Name</label>
-    <input type="text" id="senderName" placeholder="e.g. Polash" maxlength="40" />
+    <input type="text" id="senderName" placeholder="e.g. Polash Islam" maxlength="40" />
   </div>
   <div class="input-group">
     <label>Your Message to Her</label>
-    <textarea id="customMsg" rows="3" placeholder="e.g. I love you, will you be my future waifu? 🥺"></textarea>
+    <textarea id="customMsg" rows="3" placeholder="e.g. love you Sahiba, will you be my future wifu? 🥺"></textarea>
   </div>
   <button class="btn btn-pink" onclick="generateLink()">Generate Link 💖</button>
   <div class="link-box" id="linkBox" style="display:none">
@@ -105,39 +106,39 @@
   </div>
 </div>
 
-<!-- ২. প্রপোজাল স্ক্রিন (যাকে লিংক পাঠাবেন সে এটি দেখবে) -->
-<div class="card" id="proposalCard" style="display:none">
+<!-- ২. প্রপোজাল স্ক্রিন -->
+<div class="card" id="proposalCard">
   <div class="from-text" id="fromText"></div>
   <span class="big-heart">💖</span>
   <p class="message" id="proposalMsg"></p>
   <div class="btns">
-    <button class="btn btn-pink" onclick="sayYes()">Yes! 💖</button>
-    <button class="btn btn-ghost" onclick="sayNo()">No 🙈</button>
+    <button class="btn btn-pink" id="yesBtn" onclick="sayYes()">Yes! 💖</button>
+    <button class="btn btn-ghost" id="noBtn" onclick="sayNo()">No 🙈</button>
   </div>
 </div>
 
-<!-- ৩. ট্রাই এগেন স্ক্রিন (No চাপলে বারবার অনুরোধ করার প্যানেল) -->
-<div class="card" id="tryAgainScreen" style="display:none">
+<!-- ৩. ট্রাই এগেন স্ক্রিন -->
+<div class="card" id="tryAgainScreen">
   <span class="big-heart">🥺</span>
   <div class="try-msg">Are you sure...? 😢</div>
   <p class="try-sub" id="tryAgainSub"></p>
-  <button class="btn btn-pink" onclick="tryAgain()">দয়া করে আবার একটু চেষ্টা করুন 💖</button>
+  <button class="btn btn-pink" onclick="tryAgain()">দয়া করে আবার একটু চেষ্টা করুন 💖</button>
 </div>
 
-<!-- ৪. সফল স্ক্রিন (Yes চাপলে কংগ্রাচুলেশন দেখাবে) -->
-<div class="card" id="yesScreen" style="display:none">
+<!-- ৪. সফল স্ক্রিন (এখান থেকে রিমেক বাটনটি মুছে দেওয়া হয়েছে) -->
+<div class="card" id="yesScreen">
   <span class="big-heart">💍</span>
   <div class="yes-msg">Congratulations!! 🎉</div>
   <span class="hearts-row">💖💕💗💓💞</span>
   <p class="yes-sub" id="yesSub"></p>
-  <br>
-  <button class="btn btn-pink small-btn" onclick="resetAll()">Make another one 💌</button>
 </div>
 
 <script>
   const colors = ['#ff6b9d','#ff3366','#ffb3cc','#ff80aa','#ff1a6b','#ffcce0'];
+  let noCount = 0;
+  let isViewerMode = false; // ভিউয়ার ট্র্যাকিং ভেরিয়েবল
 
-  // ব্যাকগ্রাউন্ডে হার্ট ওড়া অ্যানিমেশন
+  // ব্যাকগ্রাউন্ডে হার্ট ওড়া অ্যানিমেশন
   const hBg = document.getElementById('heartsBg');
   for(let i=0;i<18;i++){
     const h=document.createElement('div');
@@ -150,16 +151,22 @@
     hBg.appendChild(h);
   }
 
-  // লোড হওয়ার সময় ইউআরএল (URL) চেক করা
+  // লোড হওয়ার সময় ইউআরএল চেক করা
   window.addEventListener('load', () => {
     const p = new URLSearchParams(window.location.search);
     const name = p.get('from');
     const msg = p.get('msg');
     
     if(name && msg) {
+      isViewerMode = true; // লিংক দিয়ে ভিজিট করলে ভিউয়ার মোড চালু হবে
       loadProposal(name, msg);
     } else {
-      show('setupScreen');
+      // যদি কেউ সরাসরি বা প্যারামিটার ছাড়া ঢোকার চেষ্টা করে এবং সে যদি ভিউয়ার হয়, তবে রিডাইরেক্ট হবে
+      if (window.location.search.includes('mode=view') || document.referrer !== "") {
+         document.body.innerHTML = "<h2 style='color:#ff6b9d; text-align:center; font-family:sans-serif; margin-top:40vh;'>Access Denied 🔒</h2>";
+      } else {
+         show('setupScreen'); // শুধুমাত্র ফার্স্ট টাইম আপনার জন্য ওপেন হবে
+      }
     }
   });
 
@@ -168,7 +175,9 @@
     const name = document.getElementById('senderName').value.trim() || 'Someone Special';
     const msg = document.getElementById('customMsg').value.trim() || 'I love you, will you be my future waifu? 🥺';
     const base = window.location.href.split('?')[0];
-    const url = `${base}?from=${encodeURIComponent(name)}&msg=${encodeURIComponent(msg)}`;
+    
+    // লিংকের শেষে '&mode=view' যোগ করা হয়েছে সিকিউরিটির জন্য
+    const url = `${base}?from=${encodeURIComponent(name)}&msg=${encodeURIComponent(msg)}&mode=view`;
     document.getElementById('linkUrl').textContent = url;
     document.getElementById('linkBox').style.display = 'block';
   }
@@ -187,32 +196,53 @@
   function loadProposal(name, msg) {
     document.getElementById('fromText').textContent = `from ${name}, with love 💌`;
     document.getElementById('proposalMsg').textContent = `"${msg}"`;
-    document.getElementById('tryAgainSub').textContent = `${name} আপনার জন্য পুরো হৃদয় নিয়ে অপেক্ষা করছে... দয়া করে আরেকবার ভেবে দেখুন? 💔`;
-    document.getElementById('yesSub').textContent = `আপনারা অফিসিয়ালি এখন কিউটেস্ট কাপল! ${name}-এর হৃদয় খুশিতে আত্মহারা! 🥰`;
+    document.getElementById('tryAgainSub').textContent = `${name} আপনার জন্য পুরো হৃদয় নিয়ে অপেক্ষা করছে... দয়া করে আরেকবার ভেবে দেখুন? 💔`;
+    document.getElementById('yesSub').textContent = `আপনাকে অসংখ্য ধন্যবাদ প্রোপোজালটি একসেপ্ট করার জন্য! ${name}-এর হৃদয় খুশিতে আত্মহারা! 🥰`;
     show('proposalCard');
   }
 
-  // No এবং Yes এর ফাংশনালিটি (The Loop Logic)
-  function sayNo() { show('tryAgainScreen'); }
-  function tryAgain() { show('proposalCard'); } // এটি আবার প্রপোজাল কার্ডে (Yes/No অপশনে) ফেরত নিয়ে যাবে
-  function sayYes() { show('yesScreen'); launchConfetti(); }
-  
-  function resetAll() {
-    history.replaceState(null, '', window.location.pathname);
-    document.getElementById('senderName').value = '';
-    document.getElementById('customMsg').value = '';
-    document.getElementById('linkBox').style.display = 'none';
-    show('setupScreen');
+  // No এবং Yes এর ফাংশনালিটি
+  function sayNo() { 
+    noCount++;
+    const yesBtn = document.getElementById('yesBtn');
+    const noBtn = document.getElementById('noBtn');
+    
+    // নো চাপলে ইয়েস বাটন বড় হবে
+    yesBtn.style.transform = `scale(${1 + noCount * 0.25})`;
+    noBtn.style.transform = `scale(${Math.max(0.5, 1 - noCount * 0.15)})`;
+    
+    if(noCount >= 3) {
+      show('tryAgainScreen'); 
+    }
+  }
+
+  function tryAgain() { 
+    show('proposalCard'); 
+  } 
+
+  function sayYes() { 
+    show('yesScreen'); 
+    launchConfetti(); 
   }
 
   // স্ক্রিন টগল করার মাস্টার ফাংশন
   function show(id) {
+    // সে যদি ভিউয়ার হয় এবং ভুলবশত বা ইচ্ছাকৃত সেটআপ স্ক্রিনে যেতে চায়, তবে আটকে দেবে
+    if(isViewerMode && id === 'setupScreen') return;
+
     ['setupScreen','proposalCard','tryAgainScreen','yesScreen'].forEach(s => {
-      document.getElementById(s).style.display = s === id ? 'flex' : 'none';
+      const el = document.getElementById(s);
+      if(s === id) {
+        el.style.display = 'flex';
+        setTimeout(() => el.classList.add('active'), 10);
+      } else {
+        el.classList.remove('active');
+        el.style.display = 'none';
+      }
     });
   }
 
-  // পার্টিকেল/কনফেটি অ্যানিমেশন (সফলতার পর)
+  // পার্টিকেল/কনফেটি অ্যানিমেশন
   function launchConfetti() {
     for(let i=0;i<80;i++){
       setTimeout(()=>{
